@@ -36,4 +36,3 @@ import VisualMenu
 * Enable() - Activates the event.
 ## Information
 If you need to contact me, this is my email - sw3atyspace@gmail.com. You can also subscribe to my [YouTube](https://www.youtube.com/channel/UCkAldFCFSeFz1h61lHv4t6Q) and join my [Discord Server](https://discord.gg/jchJKYqNmK)
-discord server -
