@@ -1,15 +1,21 @@
-# VisualMenu
+# VisualMenu v0.0.1
 This library makes it easy to create a beautiful visual menu. <br/><br/>
 ![screen](https://user-images.githubusercontent.com/72179940/150559924-be17458d-64be-4336-a6f3-a9b94523ef0c.png)
-## Installation
-To use, download the archive, transfer the contents from the «VisualMenu-main» folder. The "readme.md" and "example.py" files can be deleted. You also need to install the [colorama](https://pypi.org/project/colorama/) library
 ## Documentation
+### Installation
+To use, download the archive, transfer the contents from the «VisualMenu-main» folder. The "readme.md" and "example.py" files can be deleted. You also need to install the [colorama](https://pypi.org/project/colorama/) library.
+
 ### Import
 To import a library write:
 ```
 import VisualMenu
 ```
----
+### Cross-platform
+Visual Menu natively works on Windows but can work on Linux and macOS. For cross-platform, you need to call the init function:
+```
+VisualMenu.init()
+```
+The function will raise a DetectSystemError if the platform is not defined.
 ### Menu class
 #### Arguments
 * title (type: str) - The title of the instance. Shown on top of all tabbed items. Also displayed as a submenu item.
@@ -23,7 +29,6 @@ import VisualMenu
 * Disable() - Closes the menu loop.
 * add_event(*events) - Adds instances to the menu.
 * del_event(*events) - Removes instances from the menu.
----
 ### Event class
 #### Arguments
 * title (type: str) - The title of the instance. Shown on top of all tabbed items. Also displayed as a submenu item.
@@ -35,4 +40,4 @@ import VisualMenu
 #### Functions
 * Enable() - Activates the event.
 ## Information
-If you need to contact me, this is my email - sw3atyspace@gmail.com. You can also subscribe to my [YouTube](https://www.youtube.com/channel/UCkAldFCFSeFz1h61lHv4t6Q) and join my [Discord Server](https://discord.gg/jchJKYqNmK)
+If you need to contact me, this is my email - sw3atyspace@gmail.com. You can also subscribe to my [YouTube](https://www.youtube.com/channel/UCkAldFCFSeFz1h61lHv4t6Q) and join my [Discord Server](https://discord.gg/jchJKYqNmK).
