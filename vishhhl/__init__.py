@@ -1,9 +1,8 @@
 """
 vishhhl version 0.2
-Based on the VisualMenu library
-This library makes it easy to create a beautiful visual menu in the console. There is support for most Sw3aty developments.
+This library makes it easy to create a beautiful visual menu in the console. Based on the VisualMenu library.
 Email - sw3atyspace@gmail.com
-Documentation - Nothing
+Documentation - https://github.com/Sw3aty-Acc/vishhhl/blob/vishhhl/README.md
 Discord Server - https://discord.com/invite/jchJKYqNmK
 Youtube - https://www.youtube.com/@sw3aty702
 """
