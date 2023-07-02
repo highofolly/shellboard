@@ -1,12 +1,12 @@
 """
-Visual Menu version 0.0.1
-This library makes it easy to create a beautiful visual menu.
+vishhhl version 0.2
+This library makes it easy to create a beautiful visual menu in the console. Based on the VisualMenu library.
 Email - sw3atyspace@gmail.com
-Documentation - https://github.com/Sw3aty-Acc/VisualMenu/blob/main/README.md#documentation
+Documentation - https://github.com/Sw3aty-Acc/vishhhl/blob/vishhhl/README.md
 Discord Server - https://discord.com/invite/jchJKYqNmK
-Youtube - https://www.youtube.com/channel/UCkAldFCFSeFz1h61lHv4t6Q
+Youtube - https://www.youtube.com/@sw3aty702
 """
-
+from datetime import datetime
 from msvcrt import getch
 from os import system
 from time import sleep
@@ -14,19 +14,6 @@ import colorama
 
 colorama.init()
 cmd_clear = "cls"
-
-
-def init():
-    global cmd_clear
-    import platform
-    os = platform.system()
-    if os == "Linux" or os == "Darwin":
-        cmd_clear = "clear"
-    elif os != "Windows":
-        class DetectSystemError(LookupError):
-            pass
-
-        raise DetectSystemError("Failed to detect system")
 
 
 class Event:
@@ -87,15 +74,39 @@ class Menu:
         """Activates the menu and creates a loop."""
         self.cursor = 0
         self.enable = True
+        cursorKey = ""
+        tmpOld = datetime.now()
         while self.enable:
             self._print(old)
             while True:
                 pressedKey = getch()
-                if pressedKey == b'H' and self.cursor != 0:
-                    self.cursor -= 1
+                try:
+                    if pressedKey.decode().isdigit():
+                        tmpNow = datetime.now()
+                        if (tmpNow - tmpOld).total_seconds() > 0.75:
+                            cursorKey = ""
+                        cursorKey += pressedKey.decode()
+                        self.cursor = int(cursorKey) - 1
+                        if self.cursor >= len(self.events):
+                            self.cursor = len(self.events)
+                        elif self.cursor < 0:
+                            self.cursor = 0
+                        tmpOld = tmpNow
+                        break
+                except UnicodeDecodeError:
+                    pass
+
+                if pressedKey == b'H':
+                    if self.cursor == 0:
+                        self.cursor = len(self.events)
+                    else:
+                        self.cursor -= 1
                     break
-                elif pressedKey == b'P' and self.cursor != len(self.events):
-                    self.cursor += 1
+                elif pressedKey == b'P':
+                    if self.cursor == len(self.events):
+                        self.cursor = 0
+                    else:
+                        self.cursor += 1
                     break
                 elif pressedKey == b'\r':
                     if self.cursor == len(self.events):

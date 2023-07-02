@@ -1,21 +1,18 @@
-# VisualMenu v0.0.1
-This library makes it easy to create a beautiful visual menu. <br/><br/>
-![screen](https://user-images.githubusercontent.com/72179940/150559924-be17458d-64be-4336-a6f3-a9b94523ef0c.png)
+# vishhhl library
+This library makes it easy to create a beautiful visual menu in the console. Based on the VisualMenu library. <br/><br/>
+![image](https://github.com/Sw3aty-Acc/vishhhl/assets/72179940/3c6019a4-fa13-4ba6-98ca-51caa3e58027)
+
 ## Documentation
 ### Installation
-To use, download the archive, transfer the contents from the «VisualMenu-main» folder. The "readme.md" and "example.py" files can be deleted. You also need to install the [colorama](https://pypi.org/project/colorama/) library.
+To use, download and unzip the archive. Then move the «vishhhl» folder to your project
+#### Required libraries:
+* [colorama](https://pypi.org/project/colorama/) library.
 
 ### Import
 To import a library write:
 ```
-import VisualMenu
+import vishhhl
 ```
-### Cross-platform
-Visual Menu natively works on Windows but can work on Linux and macOS. For cross-platform, you need to call the init function:
-```
-VisualMenu.init()
-```
-The function will raise a DetectSystemError if the platform is not defined.
 ### Menu class
 #### Arguments
 * title (type: str) - The title of the instance. Shown on top of all tabbed items. Also displayed as a submenu item.
@@ -40,4 +37,6 @@ The function will raise a DetectSystemError if the platform is not defined.
 #### Functions
 * Enable() - Activates the event.
 ## Information
-If you need to contact me, this is my email - sw3atyspace@gmail.com. You can also subscribe to my [YouTube](https://www.youtube.com/channel/UCkAldFCFSeFz1h61lHv4t6Q) and join my [Discord Server](https://discord.gg/jchJKYqNmK).
+Email - sw3atyspace@gmail.com \
+YouTube - [Sw3aty](https://www.youtube.com/@sw3aty702) \
+Discord Server - [swet-gaang](https://discord.gg/jchJKYqNmK)
