@@ -1,4 +1,4 @@
-from VisualMenu import Menu, colorama, Event
+from vishhhl import Menu, colorama, Event
 
 volume = 100
 
@@ -8,7 +8,7 @@ def set_volume():
     setting_music.description = f"Current {volume}"
 
 
-menu = Menu("Menu", description=f"This is the {colorama.Fore.MAGENTA}Visual Menu{colorama.Style.RESET_ALL} of version 0.0.1!")
+menu = Menu("Menu", description=f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL} of version 0.2!")
 
 start = Menu(title="Start", description="Function not active", active=False)
 
