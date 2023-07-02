@@ -2,7 +2,7 @@
 Visual Menu version 0.0.1
 This library makes it easy to create a beautiful visual menu.
 Email - sw3atyspace@gmail.com
-Documentation - https://github.com/Sw3aty-Acc/VisualMenu/blob/main/README.md#documentation
+Documentation - https://github.com/Sw3aty-Acc/VisualMenu/blob/Visual-Menu/README.md#documentation
 Discord Server - https://discord.com/invite/jchJKYqNmK
 Youtube - https://www.youtube.com/channel/UCkAldFCFSeFz1h61lHv4t6Q
 """
