@@ -1,6 +1,6 @@
 # vishhhl library
 This library makes it easy to create a beautiful visual menu in the console. Based on the VisualMenu library. <br/><br/>
-![image](https://github.com/Sw3aty-Acc/vishhhl/assets/72179940/3c6019a4-fa13-4ba6-98ca-51caa3e58027)
+![image](https://github.com/Sw3aty-Acc/vishhhl/assets/72179940/e2a6d311-35e3-4236-9444-b0110bdc90c0)
 
 ## Documentation
 ### Installation
@@ -13,29 +13,33 @@ To import a library write:
 ```
 import vishhhl
 ```
-### Menu class
+### Menu class (Parent: Event class)
 #### Arguments
-* title (type: str) - The title of the instance. Shown on top of all tabbed items. Also displayed as a submenu item.
-* description (type: str) - Description of the instance. Shown above the title. It is also displayed to the right of the submenu item. Initially None.
-* display_descript (type: bool) - If False is passed, the submenu description will be hidden. Initially True.
-* active (type: bool) - If False is passed, the submenu item will be disabled. Initially True.
-* color (type: colorama) - The color of the cursor in the menu. Originally colorama.Fore.CYAN.
-* events (type: list) - List of instances. Initially None.
+* title (type: str) - Instance name. Displayed on top of all elements.
+* desc (type: str) - Description of the instance. Shown above the title.
 #### Functions
-* Enable() - Activates the menu and creates a loop.
-* Disable() - Closes the menu loop.
-* add_event(*events) - Adds instances to the menu.
-* del_event(*events) - Removes instances from the menu.
+* changeTitle() - Changes the menu name.
+* changeDesc() - Changes the menu description.
+* enable() - Activates the menu and creates a loop.
+* disable() - Closes the menu loop.
+* addEvent(*events, index) - Adds instances to the menu.
+* delEvent(*events) - Removes instances from the menu.
+
+### Option class (Parent: Event class)
+#### Arguments
+* text (type: str) Instance name.
+* desc (type: str) - Description of the instance. Shown above the title. It is also displayed to the right of the submenu item. Initially None.
+* obj_menu (type: object) - Menu object to call.
+* color (type: colorama) - Color of the cursor in the menu.
+
 ### Event class
 #### Arguments
-* title (type: str) - The title of the instance. Shown on top of all tabbed items. Also displayed as a submenu item.
-* description (type: str) - Description of the instance. Shown above the title. It is also displayed to the right of the submenu item. Initially None.
-* display_descript (type: bool) - If False is passed, the submenu description will be hidden. Initially True.
-* active (type: bool) - If False is passed, the submenu item will be disabled. Initially True.
-* function (type: function) - The function to call.
-* agrs (type: list) - Arguments to pass to the function. Initially None.
+* text (type: str) Instance name.
+* desc (type: str) - Description of the instance. Shown above the title. It is also displayed to the right of the submenu item. Initially None.
+* func (type: object) The function to call.
+* args (type: list) Arguments to pass to the function.
 #### Functions
-* Enable() - Activates the event.
+* enable() - Activates the event.
 ## Information
 Email - sw3atyspace@gmail.com \
 YouTube - [Sw3aty](https://www.youtube.com/@sw3aty702) \
