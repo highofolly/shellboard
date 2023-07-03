@@ -1,94 +1,93 @@
 """
-vishhhl version 0.2
+vishhhl version 0.3
 This library makes it easy to create a beautiful visual menu in the console. Based on the VisualMenu library.
 Email - sw3atyspace@gmail.com
-Documentation - https://github.com/Sw3aty-Acc/vishhhl/blob/vishhhl/README.md
 Discord Server - https://discord.com/invite/jchJKYqNmK
 Youtube - https://www.youtube.com/@sw3aty702
 """
 from datetime import datetime
 from msvcrt import getch
 from os import system
-from time import sleep
 import colorama
 
 colorama.init()
 cmd_clear = "cls"
 
-
 class Event:
     def __init__(self,
-                 title: str,
-                 function,
+                 text: str,
+                 func,
                  args: list = None,
-                 description: str = None,
-                 display_descript:
-                 bool = True,
-                 active: bool = True):
+                 desc: str = None,
+                 color: colorama = colorama.Fore.CYAN):
         """
-        :param title: The title of the instance. Shown on top of all tabbed items. Also displayed as a submenu item.
-        :param function: The function to call.
+        :param text: Instance name.
+        :param func: The function to call.
         :param args: Arguments to pass to the function.
-        :param description: Description of the instance. Shown above the title. It is also displayed to the right of the submenu item.
-        :param display_descript: If False is passed, the submenu description will be hidden.
-        :param active: If False is passed, the submenu item will be disabled.
+        :param desc: Description of the instance.
         """
-        self.title = title
-        self.description = description or ""
-        self.display_descript = display_descript
-        self.active = active
-        self.function = function
+        self.text = text
+        self.func = func
         self.args = args or []
+        self.desc = desc or ""
+        self.color = color
 
-    def Enable(self, old=None):
+    def enable(self):
         """Activates the event."""
-        self.function(*self.args)
+        self.func(*self.args)
 
 
-class Menu:
+class Menu(Event):
     def __init__(self,
                  title: str,
-                 description: str = None,
-                 display_descript: bool = True,
-                 active: bool = True,
-                 color: colorama = colorama.Fore.CYAN,
-                 events: list = None):
+                 desc: str = None,
+                 opt_list: list = None):
         """
-        :param title: The title of the instance. Shown on top of all tabbed items. Also displayed as a submenu item.
-        :param description: Description of the instance. Shown above the title. It is also displayed to the right of the submenu item.
-        :param display_descript: If False is passed, the submenu description will be hidden.
-        :param active: If False is passed, the submenu item will be disabled.
-        :param color: The color of the cursor in the menu.
-        :param events: List of instances.
+        :param title: Instance name. Displayed on top of all elements.
+        :param desc: Description of the instance. Shown above the title.
         """
-        self.title = title
-        self.description = description
-        self.display_descript = display_descript
-        self.active = active
-        self.color = color
-        self.events = events or []
+        super().__init__(title, None, desc)
+        self.desc = desc
+        self.opt_list = opt_list or []
 
-        self.enable = False
+        self.loop = False
 
-    def Enable(self, old=None):
+    def changeTitle(self, title):
+        """
+        :param title: Instance name. Displayed on top of all elements.
+        """
+        self.text = title
+
+    def changeDesc(self, desc):
+        """
+        :param desc: Description of the instance. Shown above the title.
+        """
+        self.desc = desc
+
+    def update(self):
+        """A function that runs in a loop."""
+        pass
+
+    def enable(self):
         """Activates the menu and creates a loop."""
         self.cursor = 0
-        self.enable = True
+        self.loop = True
         cursorKey = ""
         tmpOld = datetime.now()
-        while self.enable:
-            self._print(old)
+        while self.loop:
+            self.update()
+            self._print()
             while True:
                 pressedKey = getch()
                 try:
                     if pressedKey.decode().isdigit():
                         tmpNow = datetime.now()
-                        if (tmpNow - tmpOld).total_seconds() > 0.75:
+                        if (tmpNow - tmpOld).total_seconds() > 0.75 and len(cursorKey) < 4:
                             cursorKey = ""
                         cursorKey += pressedKey.decode()
                         self.cursor = int(cursorKey) - 1
-                        if self.cursor >= len(self.events):
-                            self.cursor = len(self.events)
+                        if self.cursor >= len(self.opt_list):
+                            self.cursor = len(self.opt_list)-1
                         elif self.cursor < 0:
                             self.cursor = 0
                         tmpOld = tmpNow
@@ -98,58 +97,70 @@ class Menu:
 
                 if pressedKey == b'H':
                     if self.cursor == 0:
-                        self.cursor = len(self.events)
+                        self.cursor = len(self.opt_list)-1
                     else:
                         self.cursor -= 1
                     break
                 elif pressedKey == b'P':
-                    if self.cursor == len(self.events):
+                    if self.cursor == len(self.opt_list)-1:
                         self.cursor = 0
                     else:
                         self.cursor += 1
                     break
                 elif pressedKey == b'\r':
-                    if self.cursor == len(self.events):
-                        return
-                    elif self.cursor != len(self.events) and self.events[self.cursor].active:
-                        self.events[self.cursor].Enable(self.title)
-                        break
-                sleep(.1)
+                    self.opt_list[self.cursor].enable()
+                    break
 
-    def Disable(self):
+    def disable(self):
         """Closes the menu loop."""
-        self.enable = False
+        self.loop = False
 
-    def _print(self, old):
-        tmp = []
-        if self.cursor == len(self.events):
-            for i in range(len(self.events)):
-                tmp.append(self.events[i].title)
-            tmp.append(f"{self.color}> Back{colorama.Style.RESET_ALL}")
-        else:
-            for i in range(len(self.events)):
-                if self.cursor == i:
-                    tmp.append(
-                        f"{self.color if self.events[i].active else colorama.Fore.LIGHTRED_EX}> {self.events[i].title}" + (
-                            f" {colorama.Fore.LIGHTBLACK_EX}{self.events[i].description}{colorama.Style.RESET_ALL}" if
-                            self.events[i].description and self.events[
-                                i].display_descript else colorama.Style.RESET_ALL))
-                else:
-                    tmp.append(self.events[i].title)
-            tmp.append("Back")
+    def _print(self):
+        tmp_list = []
+        for i in range(len(self.opt_list)):
+            if self.cursor == i:
+                tmp_list.append(
+                    f"{self.opt_list[i].color}> {self.opt_list[i].text}" +
+                    (f" {colorama.Fore.LIGHTBLACK_EX}{self.opt_list[i].desc}{colorama.Style.RESET_ALL}"))
+            else:
+                tmp_list.append(self.opt_list[i].text)
 
         system(cmd_clear)
-        print((f"{self.description}\n" if self.description else "") + (
-            f"\t{old} | {self.title}\n" if old else f"\t{self.title}\n") + "\n".join(tmp))
+        print((f"{self.desc}\n" if self.desc else "") + f"\t{self.text}\n" + "\n".join(tmp_list))
 
-    def add_event(self, *events):
+    def addOption(self, *options, index=None):
         """Adds instances to the menu."""
-        for i in events:
-            self.events.append(i)
+        if index is None:
+            if len(self.opt_list):
+                index = len(self.opt_list)
+            else:
+                for i in options:
+                    self.opt_list.append(i)
+                return
+        for i in options:
+            self.opt_list.insert(index, i)
 
-    def del_event(self, *events):
+    def delOption(self, *options):
         """Removes instances from the menu."""
-        for i in events:
-            for uid in range(len(self.events)):
-                if i == self.events[uid]:
-                    del self.events[uid]
+        try:
+            for i in options:
+                for uid in range(len(self.opt_list)):
+                    if i == self.opt_list[uid]:
+                        del self.opt_list[uid]
+        except IndexError:
+            return 1
+
+class Option(Event):
+    def __init__(self,
+                 text: str,
+                 obj_menu: Menu = None,
+                 desc: str = None,
+                 color: colorama = colorama.Fore.CYAN):
+        """
+        :param text: Instance name.
+        :param obj_menu: Function to call.
+        :param desc: Description of the instance. Displayed to the right of the option.
+        :param color: Color of the cursor in the menu.
+        """
+        color = color if obj_menu else colorama.Fore.LIGHTRED_EX
+        super().__init__(text, obj_menu.enable if obj_menu else None, desc=desc, color=color)
