@@ -1,27 +1,70 @@
-from vishhhl import Menu, colorama, Event
+"""
+This is a code example showing the main features of the library. 
+"""
 
-volume = 100
+from vishhhl import Menu, Option, Event, colorama
+clrm = colorama.Fore
 
-def set_volume():
-    global volume
-    volume = input("\nEnter music volume: ")
-    setting_music.description = f"Current {volume}"
+login = None
+
+class clsSetting(Menu):
+    def __init__(self):
+        super().__init__(f"Settings", desc=f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL} of version 0.3!")
+        self.option = Option("Settings", obj_menu=self, desc="Customize button color")
+        self.addOption(Event("Red", func=self.changeColor, args=[0]),
+                       Event("Green", func=self.changeColor, args=[1]),
+                       Event("Cyan", func=self.changeColor, args=[2]),
+                       Event("Back", func=self.disable))
+
+    def changeColor(self, index):
+        for i in menMain.opt_list + self.opt_list:
+            i.color = (clrm.RED, clrm.GREEN, clrm.CYAN)[index]
+
+    def update(self):
+        if login:
+            self.changeTitle(f"Settings | Authorized: {login}")
+        else:
+            self.changeTitle(f"Settings")
+
+class clsMain(Menu):
+    def __init__(self):
+        super().__init__("Menu", desc=f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL} of version 0.3!")
+        self.optLogIn = Event(text="Log in", func=self.fLogIn, desc="Log in to continue")
+        self.optLogOut = Event(text="Log out", func=self.fLogOut, desc="Log out from system")
+
+        menSetting = clsSetting()
+
+        eveInfo = Event(text="Information", func=input,
+                        args=["\nEmail - sw3atyspace@gmail.com "
+                              "\nYouTube - https://www.youtube.com/@sw3aty702 "
+                              "\nDiscord Server - https://discord.gg/jchJKYqNmK"])
+        eveExit = Event(text="Exit", func=self.f_quit)
+
+        self.addOption(self.optLogIn, menSetting.option, eveInfo, eveExit)
+
+    def update(self):
+        if login:
+            self.changeTitle(f"Menu | Authorized: {login}")
+        else:
+            self.changeTitle(f"Menu")
+
+    def fLogIn(self):
+        global login
+        login = input("\nEnter your name: ")
+        self.delOption(self.optLogIn)
+        self.addOption(self.optLogOut, index=0)
+
+    def fLogOut(self):
+        global login
+        login = None
+        self.delOption(self.optLogOut)
+        self.addOption(self.optLogIn, index=0)
+
+    def f_quit(self):
+        ans = input("\nDo you really want to go out (Y/n) ").upper()
+        if ans == "Y":
+            exit()
 
 
-menu = Menu("Menu", description=f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL} of version 0.2!")
-
-start = Menu(title="Start", description="Function not active", active=False)
-
-setting = Menu(title="Setting")
-setting_music = Event("Music volume", set_volume, description=f"Current {volume}")
-setting.add_event(setting_music)
-
-information = Event(title="Information", function=input, args=["\nIf you need to contact me, this is my email - sw3atyspace@gmail.com.\nYou can also subscribe to my YouTube (https://www.youtube.com/channel/UCkAldFCFSeFz1h61lHv4t6Q)\nand join my Discord Server (https://discord.gg/jchJKYqNmK)"])
-
-menu.add_event(start, setting, information)
-
-while True:
-    menu.Enable()
-    ans = input("\nDo you really want to go out (Y/n) ").upper()
-    if ans == "Y":
-        break
+menMain = clsMain()
+menMain.enable()
