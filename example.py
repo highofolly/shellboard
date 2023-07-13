@@ -2,19 +2,20 @@
 This is a code example showing the main features of the library. 
 """
 
-from vishhhl import Menu, Option, Event, colorama
+from vishhhl import Menu, Option, Event, colorama, version
 clrm = colorama.Fore
 
 login = None
 
 class clsSetting(Menu):
     def __init__(self):
-        super().__init__(f"Settings", desc=f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL} of version 0.3!")
+        super().__init__(f"Settings", desc=f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL} of version {version}!")
         self.option = Option("Settings", obj_menu=self, desc="Customize button color")
         self.addOption(Event("Red", func=self.changeColor, args=[0]),
                        Event("Green", func=self.changeColor, args=[1]),
                        Event("Cyan", func=self.changeColor, args=[2]),
                        Event("Back", func=self.disable))
+        self.option_type = [r"\optText", r"\optColor > \optText < \optDesc \clrm.RESET"]
 
     def changeColor(self, index):
         for i in menMain.opt_list + self.opt_list:
@@ -28,7 +29,7 @@ class clsSetting(Menu):
 
 class clsMain(Menu):
     def __init__(self):
-        super().__init__("Menu", desc=f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL} of version 0.3!")
+        super().__init__("Menu", desc=f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL} of version {version}!")
         self.optLogIn = Event(text="Log in", func=self.fLogIn, desc="Log in to continue")
         self.optLogOut = Event(text="Log out", func=self.fLogOut, desc="Log out from system")
 

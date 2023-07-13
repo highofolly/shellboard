@@ -1,10 +1,14 @@
 """
-vishhhl version 0.3
+vishhhl version 0.3.1
 This library makes it easy to create a beautiful visual menu in the console. Based on the VisualMenu library.
 Email - sw3atyspace@gmail.com
 Discord Server - https://discord.com/invite/jchJKYqNmK
 Youtube - https://www.youtube.com/@sw3aty702
 """
+
+version = "0.3.1"
+
+import numpy as np
 from datetime import datetime
 from msvcrt import getch
 from os import system
@@ -13,31 +17,8 @@ import colorama
 colorama.init()
 cmd_clear = "cls"
 
-class Event:
-    def __init__(self,
-                 text: str,
-                 func,
-                 args: list = None,
-                 desc: str = None,
-                 color: colorama = colorama.Fore.CYAN):
-        """
-        :param text: Instance name.
-        :param func: The function to call.
-        :param args: Arguments to pass to the function.
-        :param desc: Description of the instance.
-        """
-        self.text = text
-        self.func = func
-        self.args = args or []
-        self.desc = desc or ""
-        self.color = color
 
-    def enable(self):
-        """Activates the event."""
-        self.func(*self.args)
-
-
-class Menu(Event):
+class Layer:
     def __init__(self,
                  title: str,
                  desc: str = None,
@@ -46,11 +27,19 @@ class Menu(Event):
         :param title: Instance name. Displayed on top of all elements.
         :param desc: Description of the instance. Shown above the title.
         """
-        super().__init__(title, None, desc)
-        self.desc = desc
+        self.title = title
+        self.desc = desc or ""
         self.opt_list = opt_list or []
 
+        self.title_type = r"\desc\n\t\title"
+        self.option_type = [r"\optText", r"\optColor > \optText \clrm.LIGHTBLACK_EX \optDesc \clrm.RESET"]
+        self.max_items_column = 0
+        self.key_hook = True
+
         self.loop = False
+        self.tmpOld = datetime.now()
+        self.cursor = 0
+        self.cursorKey = ""
 
     def changeTitle(self, title):
         """
@@ -63,70 +52,6 @@ class Menu(Event):
         :param desc: Description of the instance. Shown above the title.
         """
         self.desc = desc
-
-    def update(self):
-        """A function that runs in a loop."""
-        pass
-
-    def enable(self):
-        """Activates the menu and creates a loop."""
-        self.cursor = 0
-        self.loop = True
-        cursorKey = ""
-        tmpOld = datetime.now()
-        while self.loop:
-            self.update()
-            self._print()
-            while True:
-                pressedKey = getch()
-                try:
-                    if pressedKey.decode().isdigit():
-                        tmpNow = datetime.now()
-                        if (tmpNow - tmpOld).total_seconds() > 0.75 and len(cursorKey) < 4:
-                            cursorKey = ""
-                        cursorKey += pressedKey.decode()
-                        self.cursor = int(cursorKey) - 1
-                        if self.cursor >= len(self.opt_list):
-                            self.cursor = len(self.opt_list)-1
-                        elif self.cursor < 0:
-                            self.cursor = 0
-                        tmpOld = tmpNow
-                        break
-                except UnicodeDecodeError:
-                    pass
-
-                if pressedKey == b'H':
-                    if self.cursor == 0:
-                        self.cursor = len(self.opt_list)-1
-                    else:
-                        self.cursor -= 1
-                    break
-                elif pressedKey == b'P':
-                    if self.cursor == len(self.opt_list)-1:
-                        self.cursor = 0
-                    else:
-                        self.cursor += 1
-                    break
-                elif pressedKey == b'\r':
-                    self.opt_list[self.cursor].enable()
-                    break
-
-    def disable(self):
-        """Closes the menu loop."""
-        self.loop = False
-
-    def _print(self):
-        tmp_list = []
-        for i in range(len(self.opt_list)):
-            if self.cursor == i:
-                tmp_list.append(
-                    f"{self.opt_list[i].color}> {self.opt_list[i].text}" +
-                    (f" {colorama.Fore.LIGHTBLACK_EX}{self.opt_list[i].desc}{colorama.Style.RESET_ALL}"))
-            else:
-                tmp_list.append(self.opt_list[i].text)
-
-        system(cmd_clear)
-        print((f"{self.desc}\n" if self.desc else "") + f"\t{self.text}\n" + "\n".join(tmp_list))
 
     def addOption(self, *options, index=None):
         """Adds instances to the menu."""
@@ -150,6 +75,153 @@ class Menu(Event):
         except IndexError:
             return 1
 
+    def delOptionByIndex(self, index):
+        """Removes instances from a menu by index."""
+        try:
+            del self.opt_list[index]
+        except IndexError:
+            return 1
+
+    def update(self):
+        """A function that runs in a loop."""
+        pass
+
+    def enable(self):
+        """Opens the loop."""
+        self.loop = True
+        self.mainLoop()
+
+    def disable(self):
+        """Closes the menu loop."""
+        self.loop = False
+
+    def mainLoop(self):
+        while self.loop:
+            self.update()
+            self.printManager()
+            while self.hookManager():
+                pass
+
+    def decodeManager(self, string, obj_option=None):
+        string = string.replace(r"\desc", self.desc)
+        string = string.replace(r"\title", self.title)
+        if obj_option:
+            string = string.replace(r"\optColor", obj_option.color)
+            string = string.replace(r"\optText", obj_option.text)
+            string = string.replace(r"\optDesc", obj_option.desc)
+            string = string.replace(r"\clrm.LIGHTBLACK_EX", colorama.Fore.LIGHTBLACK_EX)
+            string = string.replace(r"\clrm.RESET", colorama.Style.RESET_ALL)
+        string = string.replace(r"\n", "\n")
+        string = string.replace(r"\t", "\t")
+        return string
+
+    def printManager(self):
+        # todo: list division
+        # try:
+        #     split_list = np.array_split(self.opt_list, len(self.opt_list) // (len(self.opt_list) // self.max_items_column))
+        # except ZeroDivisionError:
+        #     split_list = [self.opt_list]
+        split_list = [self.opt_list]
+        print_list = []
+        for x in range(len(split_list)):
+            for i in range(len(split_list[x])):
+                if self.cursor == i:
+                    if len(print_list) < x:
+                        print_list[i] += "\t" + self.decodeManager(self.option_type[1], self.opt_list[i])
+                    else:
+                        print_list.append(self.decodeManager(self.option_type[1], self.opt_list[i]))
+                else:
+                    if len(print_list) < x:
+                        print_list[i] += "\t" + self.decodeManager(self.option_type[0], self.opt_list[i])
+                    else:
+                        print_list.append(self.decodeManager(self.option_type[0], self.opt_list[i]))
+
+        system(cmd_clear)
+        print(self.decodeManager(self.title_type) + "\n" + "\n".join(print_list))
+
+    def fastInputManager(self, pressedKey):
+        try:
+            if pressedKey.decode().isdigit():
+                tmpNow = datetime.now()
+                if (tmpNow - self.tmpOld).total_seconds() > 0.75 and len(self.cursorKey) < 4:
+                    self.cursorKey = ""
+                self.cursorKey += pressedKey.decode()
+                self.cursor = int(self.cursorKey) - 1
+                if self.cursor >= len(self.opt_list):
+                    self.cursor = len(self.opt_list) - 1
+                elif self.cursor < 0:
+                    self.cursor = 0
+                self.tmpOld = tmpNow
+                return 0
+            else:
+                return 1
+        except UnicodeDecodeError:
+            return 1
+
+    def basicInputManager(self, pressedKey):
+        if pressedKey == b'H':
+            if self.cursor == 0:
+                self.cursor = len(self.opt_list) - 1
+            else:
+                self.cursor -= 1
+            return 0
+        elif pressedKey == b'P':
+            if self.cursor == len(self.opt_list) - 1:
+                self.cursor = 0
+            else:
+                self.cursor += 1
+            return 0
+        elif pressedKey == b'\r':
+            self.opt_list[self.cursor].enable()
+            return 0
+        else:
+            return 1
+
+    def hookManager(self):
+        pressedKey = getch()
+        if self.key_hook:
+            if not self.fastInputManager(pressedKey):
+                return 0
+        return self.basicInputManager(pressedKey)
+
+
+class Event:
+    def __init__(self,
+                 text: str,
+                 func: object,
+                 args: list = None,
+                 desc: str = None,
+                 color: colorama = colorama.Fore.CYAN):
+        """
+        :param text: Instance name.
+        :param func: The function to call.
+        :param args: Arguments to pass to the function.
+        :param desc: Description of the instance.
+        :param color: Color of the cursor in the menu.
+        """
+        self.text = text
+        self.func = func
+        self.args = args or []
+        self.desc = desc or ""
+        self.color = color
+
+    def enable(self):
+        """Activates the event."""
+        self.func(*self.args)
+
+
+class Menu(Layer):
+    def __init__(self,
+                 title: str,
+                 desc: str = None,
+                 opt_list: list = None):
+        """
+        :param title: Instance name. Displayed on top of all elements.
+        :param desc: Description of the instance. Shown above the title.
+        """
+        super().__init__(title, desc, opt_list)
+
+
 class Option(Event):
     def __init__(self,
                  text: str,
@@ -158,7 +230,7 @@ class Option(Event):
                  color: colorama = colorama.Fore.CYAN):
         """
         :param text: Instance name.
-        :param obj_menu: Function to call.
+        :param obj_menu: Menu object to call.
         :param desc: Description of the instance. Displayed to the right of the option.
         :param color: Color of the cursor in the menu.
         """
