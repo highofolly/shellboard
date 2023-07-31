@@ -13,51 +13,6 @@ To import a library write:
 ```
 import vishhhl
 ```
-### Layer class (Parent: Event class)
-#### Arguments
-* title (type: str) - Instance name. Displayed on top of all elements.
-* desc (type: str) - Description of the instance. Shown above the title.
-* opt_list (type: list)
-#### Functions
-* changeTitle() - Changes the menu name.
-* changeDesc() - Changes the menu description.
-* addOption(*events, index) - Adds instances to the menu.
-* delOption(*events) - Removes instances from the menu.
-* delOptionByIndex(index) - Removes instances from a menu by index.
-* update() - A function that runs in a loop.
-* enable() - Activates the menu and creates a loop.
-* disable() - Closes the menu loop.
-#### Invisible functions
-* mainLoop()
-* decodeManager()
-* printManager()
-* fastInputManager()
-* basicInputManager(pressedKey)
-* basicInputManager(pressedKey)
-* hookManager()
-
-### Event class
-#### Arguments
-* text (type: str) Instance name.
-* desc (type: str) - Description of the instance. Shown above the title. It is also displayed to the right of the submenu item. Initially None.
-* func (type: object) - The function to call.
-* args (type: list) - Arguments to pass to the function.
-* color (type: colorama) - Color of the cursor in the menu.
-#### Functions
-* enable() - Activates the event.
-
-### Menu class (Parent: Layer class)
-#### Arguments
-* title (type: str) - Instance name. Displayed on top of all elements.
-* desc (type: str) - Description of the instance. Shown above the title.
-* opt_list (type: list)
-
-### Option class (Parent: Event class)
-#### Arguments
-* text (type: str) - Instance name.
-* desc (type: str) - Description of the instance. Shown above the title. It is also displayed to the right of the submenu item. Initially None.
-* obj_menu (type: object) - Menu object to call.
-* color (type: colorama) - Color of the cursor in the menu.
 
 ## Information
 Email - sw3atyspace@gmail.com \
