@@ -3,7 +3,7 @@ from . import function
 import os
 
 
-class consoleManagerBeta:
+class ConsoleManagerBeta:
     @staticmethod
     def getTitle() -> str:
         """Get the title of current console"""
@@ -28,24 +28,24 @@ class consoleManagerBeta:
         os.system(f"mode {x},{y}")
 
 
-class eventManager:
+class EventManager:
     def __init__(self):
         self.events = []
 
     def __add_event__(self, uid):
         self.events.append(uid)
 
-    def get(self):
+    def get_events(self) -> iter:
         return iter(self.events)
 
 
-class inputManager:
+class InputManager:
     def __init__(self):
         from msvcrt import getch
         self.getch = getch
         self.lastKey = None
 
-    def updateKey(self):
+    def updateKey(self) -> int:
         while True:
             self.lastKey = self.getch()
             if self.lastKey == b'\xe0':
@@ -54,57 +54,34 @@ class inputManager:
             else:
                 return 0x1
 
-    def lastInputKey(self):
-        return self.lastKey
 
-
-class bufferManager:
+class BufferManager:
     def __init__(self,
                  buffer: list = None,
                  symbol: str = None):
         self.buffer = buffer or []
-        self.symbol = symbol or ""
-        self.buffers = [self]
+        self.symbol = symbol or "\n"
 
-    def connect(self, buffer: function):
-        self.buffers.append(buffer)
+    def addToBuffer(self, *args: str):
+        for i in args:
+            self.buffer.append(i)
 
-    def add(self, string: str):
-        self.buffer.append(string)
+    def delFromBuffer(self, *args: str):
+        self.buffer.remove(*args)
 
-    def join(self):
-        ret = ""
-        for i in self.buffers:
-            if len(i.buffers) > 1 and i != self:
-                ret += i.join()
-            else:
-                ret += i.symbol.join(i.buffer)
-        return ret
+    def clearBuffer(self):
+        self.buffer.clear()
 
-    def clear(self):
-        self.buffer = []
+    def join(self) -> str:
+        return self.symbol.join(self.buffer)
 
     def __iadd__(self, other: str):
-        self.add(other)
+        self.addToBuffer(other)
+        return self
+
+    def __isub__(self, other: str):
+        self.delFromBuffer(other)
+        return self
 
     def __str__(self):
-        self.join()
-
-
-class bufferManagerBeta:  # todo: +mgc methods, dict
-    def __init__(self,
-                 file_name: str = "buffer"):
-        self.file_name = file_name
-        self.buffer = {}
-
-    # def updateFile(self):
-    #     open(self.file_name)
-
-    def delFrom(self, uname):
-        del self.buffer[uname]
-
-    def addTo(self, uname, string):
-        self.buffer[uname] = string
-
-    def getData(self, uname):
-        return self.buffer[uname]
+        return self.join()
