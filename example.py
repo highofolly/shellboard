@@ -1,60 +1,61 @@
 """
 This is a code example showing the main features of the library. 
 """
-
 from vishhhl.addons.Menu import *
-import colorama
-
-clrm = colorama.Fore
 
 
-class Menu(mOption):
-    login = None
+class palette:
+    pass
 
-    def __init__(self,
-                 title: str = None,
-                 desc: str = None,
-                 text: str = None,
-                 comment: str = None):
-        self.org_title = title
-        desc = desc if desc else f"This is the {colorama.Fore.MAGENTA}vishhhl{colorama.Style.RESET_ALL}!"
-        text = text if text else title
-        comment = comment if comment else desc
 
-        super().__init__(text, self, comment, title=title, desc=desc)
-        self.symbol = "\n"
-
-    def update(self):
-        if self.login:
-            self.changeTitle(f"{self.org_title} | Authorized: {self.login}")
+for i in colorama.Fore.__dict__.keys():
+    if i not in ["RESET", "BLACK"]:
+        if i[:5] == "LIGHT":
+            setattr(palette, f"{i[:5]}_{i[5:-3]}", getattr(colorama.Fore, i))
         else:
-            self.changeTitle(self.org_title)
+            setattr(palette, i, getattr(colorama.Fore, i))
+
+
+def findByIndex(index):
+    return list({i for i in palette.__dict__ if palette.__dict__[i] == index})[0]
+
+
+class Menu(mOption, mLayer):
+    def __init__(self,
+                 text: str,
+                 title: str,
+                 desc: str = None,
+                 second: str = None):
+        super().__init__(text, self, desc)
+        mLayer.__init__(self, title, second)
+        self.symbol = "\n"
 
 
 class clsSetting(Menu):
+    class lColor(mLink):
+        def __init__(self, color: palette.WHITE):
+            super().__init__(link=self.changeColor, color=color, text=findByIndex(color).title())
+
+        def changeColor(self):
+            for i in menMain.widget_list:
+                i.color = self.color
+
     def __init__(self):
-        super().__init__("Settings",
-                         comment="Customize button color")
-        self.addOption(mLink("Red", link=self.changeColor, args=[0]),
-                       mLink("Green", link=self.changeColor, args=[1]),
-                       mLink("Cyan", link=self.changeColor, args=[2]),
-                       mLink("Back", link=self.disable))
+        super().__init__("Settings", title="Settings", second="Customize button color")
+        self.algn_len = 15
 
-    def changeColor(self, index):
-        for i in menMain.func_list + self.func_list:
-            i.color = (clrm.RED, clrm.GREEN, clrm.CYAN)[index]
-
-    def on_selected(self):
-        ret = super().on_selected()
-        # input(ret)
-        return ret
+        for i in palette.__dict__.keys():
+            if i[0] != "_":
+                eval(f"self.addWidget(self.lColor(color=palette.{i}))")
+        self.addWidget(mLink("Back", link=self.disable))
+        self.colm_len = len(self.widget_list) // 3
 
 
 class clsMain(Menu):
     def __init__(self):
-        super().__init__("Menu")
-        self.optLogIn = mLink(text="Log in", link=self.fLogIn, comment="Log in to continue")
-        self.optLogOut = mLink(text="Log out", link=self.fLogOut, comment="Log out from system")
+        super().__init__(str(), title="Menu")
+        self.optLogIn = mLink(text="Log in", desc="Log in to continue", link=self.fLogIn)
+        self.optLogOut = mLink(text="Log out", desc="Log out from system", link=self.fLogOut)
 
         menSetting = clsSetting()
         eveInfo = mLink(text="Information", link=input,
@@ -63,16 +64,16 @@ class clsMain(Menu):
                               "\nDiscord Server - https://discord.gg/jchJKYqNmK"])
         eveExit = mLink(text="Exit", link=self.fQuit)
 
-        self.addOption(self.optLogIn, menSetting, eveInfo, eveExit)
+        self.addWidget(self.optLogIn, menSetting, eveInfo, eveExit)
 
     def fLogIn(self):
-        Menu.login = input("\nEnter your name: ")
-        self.delOptionByIndex(index=0)
+        self.changeSecond(input("\nEnter your name: "))
+        self.delWidgetByIndex(0)
         self.addOptionByIndex(self.optLogOut, index=0)
 
     def fLogOut(self):
-        Menu.login = None
-        self.delOptionByIndex(index=0)
+        self.changeSecond(None)
+        self.delWidgetByIndex(0)
         self.addOptionByIndex(self.optLogIn, index=0)
 
     def fQuit(self):

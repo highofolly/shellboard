@@ -10,5 +10,6 @@ version = "0.3.3"
 
 function = type(lambda: 0)
 
+import logging
 from . import Core
 from . import Widgets
