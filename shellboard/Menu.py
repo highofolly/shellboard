@@ -1,13 +1,8 @@
-"""
-Addon for todo: desc
-"""
-from . import *
-import colorama
-
-colorama.init()
+from . import colorama, Core, function
+from .Widgets import By as BY, LayerType, WidgetType
 
 
-class By(By):
+class By(BY):
     TITLE = "title"
     DESC = "desc"
     TEXT = "text"
@@ -16,85 +11,48 @@ class By(By):
     LINK = "link"
 
 
-class mWidget(WidgetType):
+class mLayer(LayerType, Core.InputManager):
     def __init__(self,
-                 _name: str,
-                 _class: str = "menu",
-                 _tag: str = "mWidget"):
-        super().__init__(_name, _class, _tag)
-
-        self.func_events[0x100] = self.on_selected
-        self.func_events[0x101] = self.on_unselected
-        self.func_events[0x102] = self.on_clicked
-
-    def on_selected(self):
-        pass
-
-    def on_unselected(self):
-        pass
-
-    def on_clicked(self):
-        pass
-
-
-class mLayer(LayerType):
-    def __init__(self,
-                 title: str or mWidget,
-                 second: str = None,
+                 title: str or WidgetType,
                  _name: str = None,
                  _class: str = "main",
-                 _tag: str = "mLayer"):
+                 _tag: str = "bmLayer"):
         """
         :param title: Instance name.
-        :param second: Description of the instance.
         """
         from datetime import datetime
-        import os
         self.datetime = datetime
-        super().__init__(_name, _class, _tag)
 
         self.title = title
-        self.second = second
 
         self.cursor = 0
-        self.loop = False
         self.cursorKey = ""
         self.old = self.datetime.now()
 
-        self.shellClear = lambda: os.system("cls")
+        super().__init__(_name, _class, _tag)
+        Core.InputManager.__init__(self)
 
-    def enable(self):
-        """Opens the loop."""
-        self.loop = True
-        self.mainLoop()
-
-    def disable(self):
-        """Closes the menu loop."""
-        self.loop = False
-
-    def updateBuffer(self):
-        self.clearBuffer()
-        self.update()
-
-        for uid, i in enumerate(self.widget_list):
-            if self.cursor == uid:
-                # i.func_list[self.cursor].__add_event__(0x100)
-                self.addToBuffer(i.on_selected())
-            else:
-                # self.buffer.add(i.func_list[self.cursor].__add_event__(0x101))
-                self.addToBuffer(i.on_unselected())
-
-    def mainLoop(self):
+    def looping(self):
+        super().looping()
         while self.loop:
-            self.update()
-            for i in self.widget_list:
-                i.update()
-            self.updateBuffer()
+            self.clearBuffer()
+            for i in enumerate(self.widget_list):
+                self.addToBuffer(self.bufferCondition(i))
             self.shellClear()
-            print(f"\t{self.title}" + (f" | {self.second}" if self.second else ""))
+            print(f"\t{self.title}")
             print(self.join())
             while self.updateCursor():
                 pass
+
+    def bufferCondition(self, i):
+        return (i[1].Selected.on if i[0] == self.cursor else i[1].Unselected.on)()
+
+    def addWidget(self, *functions):
+        for i in functions:
+            self.widget_list.append(i)
+
+    def delWidget(self, *functions):
+        self.widget_list.remove(*functions)
 
     def addOptionByIndex(self, *options, index):
         for i in options:
@@ -153,14 +111,14 @@ class mLayer(LayerType):
                 return 1
 
 
-class mLabel(mWidget):
+class mLabel(WidgetType):
     def __init__(self,
                  text: str,
                  desc: str = None,
                  color: colorama = None,
                  _name: str = None,
                  _class: str = "menu",
-                 _tag: str = "mLabel"):
+                 _tag: str = "bmLabel"):
         """
         :param text: Instance name.
         :param desc: Description of the instance.
@@ -169,13 +127,12 @@ class mLabel(mWidget):
         self.text = text
         self.desc = desc or ""
         self.color = color if color else colorama.Fore.WHITE
+
+        self.Selected = Core.EventManager(self.on_selected)
+        self.Unselected = Core.EventManager(self.on_unselected)
+        self.Clicked = Core.EventManager(self.on_clicked)
+
         super().__init__(_name, _class, _tag)
-
-    def changeText(self, text):
-        self.text = text
-
-    def changeDescription(self, desc: str):
-        self.desc = desc
 
     def on_selected(self):
         return f"{self.color}> {self.text} {colorama.Fore.LIGHTBLACK_EX}{self.desc} {colorama.Style.RESET_ALL}"
@@ -196,7 +153,7 @@ class mLink(mLabel):
                  color: colorama = None,
                  _name: str = None,
                  _class: str = "menu",
-                 _tag: str = "mLink"):
+                 _tag: str = "bmLink"):
         """
         :param text: Instance name.
         :param link: Link to function object to call.
@@ -221,11 +178,11 @@ class mOption(mLink):
                  color: colorama = colorama.Fore.CYAN,
                  _name: str = None,
                  _class: str = "menu",
-                 _tag: str = "mOption"):
+                 _tag: str = "bmOption"):
         """
         :param text: Instance name.
         :param obj_menu: Menu object to call.
         :param color: Color of the cursor in the menu.
         :param desc: Description of the instance.
         """
-        super().__init__(text, desc, obj_menu.enable, None, color, _name, _class, _tag)
+        super().__init__(text, desc, obj_menu.looping, None, color, _name, _class, _tag)

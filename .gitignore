@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+build/
+dist/
+*.pyc
+env/
+venv/
+
+test.py

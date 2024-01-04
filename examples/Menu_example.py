@@ -1,7 +1,7 @@
 """
-This is a code example showing the main features of the library. 
+This is a code example showing the main features of the library
 """
-from vishhhl.addons.Menu import *
+from shellboard.Menu import *
 
 
 class palette:
@@ -47,7 +47,7 @@ class clsSetting(Menu):
         for i in palette.__dict__.keys():
             if i[0] != "_":
                 eval(f"self.addWidget(self.lColor(color=palette.{i}))")
-        self.addWidget(mLink("Back", link=self.disable))
+        self.addWidget(mLink("Back", link=self.closing))
         self.colm_len = len(self.widget_list) // 3
 
 
@@ -83,4 +83,4 @@ class clsMain(Menu):
 
 
 menMain = clsMain()
-menMain.enable()
+menMain.looping()
