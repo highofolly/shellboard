@@ -87,7 +87,7 @@ class BufferManager:
         self.buffer.remove(*args)
 
     def clearBuffer(self):
-        self.buffer.clear()
+        self.buffer = []
 
     def join(self) -> str:
         ret = list(range(self.colm_len if len(self.buffer) > self.colm_len else len(self.buffer)))
