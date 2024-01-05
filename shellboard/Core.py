@@ -108,7 +108,6 @@ class CacheManager:
     def __call__(self, *args, **kwargs):
         self.addsToState(*args, **kwargs)
 
-    def addsToState(self, func: function, yield_func: iter, args: list = None):
-        args = args or []
-        for i in yield_func(*args):
-            self.cache.addToBuffer(func(*i))
+    def addsToState(self, buffer_class: BufferManager, yield_func: iter):
+        for i in yield_func(copy.deepcopy(buffer_class)):
+            self.cache.addToBuffer(i)
