@@ -27,24 +27,18 @@ class ConsoleManagerBeta:
 
 
 class EventManager:
-    def __init__(self, func: function = None):
-        self.func = func
+    def __init__(self, *args, **kwargs):
+        self.__func = kwargs.pop("func", None) or args[0]
 
     def set(self, func: function):
-        self.func = func
+        self.__func = func
 
-    def on(self):
-        return self.func()
+    def on(self, *args, **kwargs):
+        self.hook()
+        return self.__func(*args, **kwargs)
 
-    # def __add_event__(self, val, item=None):
-    #     item = item if item else len(self.events)
-    #     self.events[item] = val
-    #
-    # def __update_events__(self):
-    #     for i in self.events.keys():
-    #         tmp = self.events.pop(i)()
-    #         if tmp is not None:
-    #             return tmp
+    def hook(self):
+        pass
 
 
 class InputManager:
@@ -74,6 +68,17 @@ class BufferManager:
         self.colm_len = colm_len
         self.algn_len = algn_len
 
+    def __iadd__(self, other: str):
+        self.addToBuffer(other)
+        return self
+
+    def __isub__(self, other: str):
+        self.delFromBuffer(other)
+        return self
+
+    def __str__(self):
+        return self.join()
+
     def addToBuffer(self, *args: str):
         for i in args:
             self.buffer.append(i)
@@ -96,13 +101,15 @@ class BufferManager:
                 index = 0
         return self.symbol.join(ret)
 
-    def __iadd__(self, other: str):
-        self.addToBuffer(other)
-        return self
 
-    def __isub__(self, other: str):
-        self.delFromBuffer(other)
-        return self
+class CacheManager:
+    def __init__(self, *args, **kwargs):
+        self.cache = BufferManager(*args, **kwargs)
 
-    def __str__(self):
-        return self.join()
+    def __call__(self, *args, **kwargs):
+        self.addsToState(*args, **kwargs)
+
+    def addsToState(self, func: function, yield_func: iter, args: list = None):
+        args = args or []
+        for i in yield_func(*args):
+            self.cache.addToBuffer(func(*i))
