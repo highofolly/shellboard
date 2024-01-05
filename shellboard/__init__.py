@@ -11,6 +11,9 @@ __version__ = "0.4.0.1a1"
 function = type(lambda: 0)
 
 import colorama
+import datetime
+import copy
+import msvcrt
 import logging
 import ctypes
 import os
