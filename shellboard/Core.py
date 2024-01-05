@@ -1,4 +1,4 @@
-from . import function, ctypes, os
+from . import function, ctypes, os, copy, msvcrt
 
 
 class ConsoleManagerBeta:
@@ -43,8 +43,7 @@ class EventManager:
 
 class InputManager:
     def __init__(self):
-        from msvcrt import getch
-        self.getch = getch
+        self.getch = msvcrt.getch
         self.lastKey = None
 
     def updateKey(self) -> int:
