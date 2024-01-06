@@ -20,20 +20,8 @@ class WidgetType(Core.BufferManager):
 
 
 class LayerType(WidgetType):
-    def __init__(self,
-                 _name: str = None,
-                 _class: str = "main",
-                 _tag: str = "LayerType"):
-
-        class Looping(Core.EventManager):
-            def func(cls, *args, **kwargs):
-                """Open layer loop"""
-                self.loop = True
-
-        class Closing(Core.EventManager):
-            def func(cls, *args, **kwargs):
-                """Close layer loop"""
-                self.loop = False
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.widget_list = []
         self.symbol = "\n"
@@ -41,10 +29,16 @@ class LayerType(WidgetType):
 
         self.shellClear = lambda: os.system("cls")
 
-        self.looping = Looping()
-        self.closing = Closing()
+        self.looping = Core.EventManager(self.__looping())
+        self.closing = Core.EventManager(self.__closing())
 
-        super().__init__(_name, _class, _tag)
+    def __looping(self):
+        """Open layer loop"""
+        self.loop = True
+
+    def __closing(self):
+        """Close layer loop"""
+        self.loop = False
 
     def find(self, key: By.NAME, val):
         """
