@@ -27,17 +27,19 @@ class ConsoleManagerBeta:
 
 
 class EventManager:
-    def __init__(self, *args, **kwargs):
-        self.hook = kwargs.pop("hook", lambda x: x())
+    def __init__(self, event=None):
+        self.event = event or (lambda: None)
 
     def __call__(self, *args, **kwargs):
         return self.on()
 
-    def func(self, *args, **kwargs):
-        pass
+    def combine(self, func):
+        def wrapper():
+            func(self.event)
+        return self.__class__(wrapper)
 
     def on(self):
-        return self.hook(self.func)
+        return self.event()
 
 
 class InputManager:
