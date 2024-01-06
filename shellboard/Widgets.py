@@ -1,4 +1,4 @@
-from . import Core
+from . import Core, os
 
 
 class By:
@@ -15,8 +15,6 @@ class WidgetType(Core.BufferManager):
         self._name = _name
         self._class = _class
         self._tag = _tag
-
-        self.Join = Core.EventManager(self.join)
 
         super().__init__()
 
