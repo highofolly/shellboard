@@ -1,7 +1,7 @@
-# Shellboard
+# Shellboard v0.4.0.1a2
 Cross-platform framework that facilitates the development of a graphical interface for the command shell
 ## Requirements
-* [colorama](https://github.com/tartley/colorama) library.
+* [Colorama](https://github.com/tartley/colorama) library.
 ## Installation
 ```
 pip install shellboard
@@ -18,6 +18,6 @@ import shellboard
 ```
 
 ## Credits
-Email - sw3atyspace@gmail.com\
+Email - [sw3atyspace@gmail.com](mailto:youraddress@url.com) \
 Discord Server - https://discord.com/invite/jchJKYqNmK \
 Youtube - https://www.youtube.com/@sw3aty702
