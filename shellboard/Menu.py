@@ -35,16 +35,16 @@ class mLayer(LayerType, Core.InputManager):
         super().looping()
         while self.loop:
             self.clearBuffer()
-            for i in enumerate(self.widget_list):
-                self.addToBuffer(self.bufferCondition(i))
+            self.bufferCondition()
             self.shellClear()
             print(f"\t{self.title}")
             print(self.join())
             while self.updateCursor():
                 pass
 
-    def bufferCondition(self, i):
-        return (i[1].Selected.on if i[0] == self.cursor else i[1].Unselected.on)()
+    def bufferCondition(self):
+        for uid, i in enumerate(self.widget_list):
+            self.addToBuffer((i.Selected.on if uid == self.cursor else i.Unselected.on)())
 
     def addWidget(self, *functions):
         for i in functions:
