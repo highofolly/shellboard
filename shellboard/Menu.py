@@ -16,35 +16,39 @@ class mLayer(LayerType, Core.InputManager):
                  title: str or WidgetType,
                  _name: str = None,
                  _class: str = "main",
-                 _tag: str = "bmLayer"):
+                 _tag: str = "mLayer"):
         """
         :param title: Instance name.
         """
-        self.datetime = datetime.datetime
+        super().__init__(_name, _class, _tag)
+        Core.InputManager.__init__(self)
+
+        @self.looping.combine
+        def __looping(func):
+            func()
+            while self.loop:
+                self.clearBuffer()
+                self.bufferCondition()
+                self.shellClear()
+                print(f"\t{self.title}")
+                print(self.join())
+                while self.updateCursor():
+                    pass
 
         self.title = title
 
         self.cursor = 0
         self.cursorKey = ""
-        self.old = self.datetime.now()
+        self.old = datetime.datetime.now()
 
-        super().__init__(_name, _class, _tag)
-        Core.InputManager.__init__(self)
-
-    def looping(self):
-        super().looping()
-        while self.loop:
-            self.clearBuffer()
-            self.bufferCondition()
-            self.shellClear()
-            print(f"\t{self.title}")
-            print(self.join())
-            while self.updateCursor():
-                pass
+        self.looping = __looping()
+        self.isEnter = Core.EventManager(self.__isEnter())
+        self.isKeyUp = Core.EventManager(self.__isKeyUp())
+        self.isKeyDown = Core.EventManager(self.__isKeyDown())
 
     def bufferCondition(self):
         for uid, i in enumerate(self.widget_list):
-            self.addToBuffer((i.Selected.on if uid == self.cursor else i.Unselected.on)())
+            self.addToBuffer((i.on_selected if uid == self.cursor else i.on_unselected)())
 
     def addWidget(self, *functions):
         for i in functions:
@@ -61,39 +65,30 @@ class mLayer(LayerType, Core.InputManager):
         for i in indexes:
             del self.widget_list[i]
 
-    def changeTitle(self, title):
+    def setTitle(self, title):
         self.title = title
 
-    def changeSecond(self, second):
-        self.second = second
+    def __isEnter(self):
+        self.widget_list[self.cursor].on_clicked()
 
-    def isEnter(self):
-        return True if self.lastKey == b'\r' else False
+    def __isKeyUp(self):
+        self.cursor = len(self.widget_list) - 1 if self.cursor == 0 else self.cursor - 1
 
-    def isKeyUp(self):
-        return True if self.lastKey == b'H' else False
-
-    def isKeyDown(self):
-        return True if self.lastKey == b'P' else False
+    def __isKeyDown(self):
+        self.cursor = 0 if self.cursor == len(self.widget_list) - 1 else self.cursor + 1
 
     def updateCursor(self):
         self.updateKey()
-        if self.isKeyUp():
-            if self.cursor == 0:
-                self.cursor = len(self.widget_list) - 1
-            else:
-                self.cursor -= 1
-        elif self.isKeyDown():
-            if self.cursor == len(self.widget_list) - 1:
-                self.cursor = 0
-            else:
-                self.cursor += 1
-        elif self.isEnter():
-            self.widget_list[self.cursor].on_clicked()
+        if self.lastKey == b'H':
+            self.isKeyUp()
+        elif self.lastKey == b'P':
+            self.isKeyDown()
+        elif self.lastKey == b'\r':
+            self.isEnter()
         else:
             try:
                 if self.lastKey.decode().isdigit():
-                    new = self.datetime.now()
+                    new = datetime.datetime.now()
                     if (new - self.old).total_seconds() > 0.75 and len(self.cursorKey) < 4:
                         self.cursorKey = ""
                     self.cursorKey += self.lastKey.decode()
@@ -127,20 +122,17 @@ class mLabel(WidgetType):
         self.desc = desc or ""
         self.color = color if color else colorama.Fore.WHITE
 
-        self.Selected = Core.EventManager(self.on_selected)
-        self.Unselected = Core.EventManager(self.on_unselected)
-        self.Clicked = Core.EventManager(self.on_clicked)
+        self.on_selected = Core.EventManager(self.__on_selected)
+        self.on_unselected = Core.EventManager(self.__on_unselected)
+        self.on_clicked = Core.EventManager()
 
         super().__init__(_name, _class, _tag)
 
-    def on_selected(self):
+    def __on_selected(self):
         return f"{self.color}> {self.text} {colorama.Fore.LIGHTBLACK_EX}{self.desc} {colorama.Style.RESET_ALL}"
 
-    def on_unselected(self):
+    def __on_unselected(self):
         return f"{self.text}"
-
-    def on_clicked(self):
-        self.color = colorama.Fore.RED
 
 
 class mLink(mLabel):
@@ -160,28 +152,30 @@ class mLink(mLabel):
         :param desc: Description of the instance.
         :param color: Color of the cursor in the menu.
         """
+        super().__init__(text, desc, color if color else colorama.Fore.CYAN, _name, _class, _tag)
+
         self.link = link if link else function
         self.args = args or []
-        color = color if color else colorama.Fore.CYAN
-        super().__init__(text, desc, color, _name, _class, _tag)
 
-    def on_clicked(self):
+        self.on_clicked = Core.EventManager(self.__on_clicked)
+
+    def __on_clicked(self):
         return self.link(*self.args)
 
 
 class mOption(mLink):
     def __init__(self,
                  text: str,
-                 obj_menu: mLayer,
+                 obj: mLayer,
                  desc: str = None,
                  color: colorama = colorama.Fore.CYAN,
                  _name: str = None,
                  _class: str = "menu",
-                 _tag: str = "bmOption"):
+                 _tag: str = "mOption"):
         """
         :param text: Instance name.
         :param obj_menu: Menu object to call.
         :param color: Color of the cursor in the menu.
         :param desc: Description of the instance.
         """
-        super().__init__(text, desc, obj_menu.looping, None, color, _name, _class, _tag)
+        super().__init__(text, desc, obj.looping, None, color, _name, _class, _tag)
