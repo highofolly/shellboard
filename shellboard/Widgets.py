@@ -26,25 +26,27 @@ class LayerType(WidgetType):
                  _name: str = None,
                  _class: str = "main",
                  _tag: str = "LayerType"):
-        import os
+
+        class Looping(Core.EventManager):
+            def func(cls, *args, **kwargs):
+                """Open layer loop"""
+                self.loop = True
+
+        class Closing(Core.EventManager):
+            def func(cls, *args, **kwargs):
+                """Close layer loop"""
+                self.loop = False
+
         self.widget_list = []
         self.symbol = "\n"
         self.loop = False
 
         self.shellClear = lambda: os.system("cls")
 
-        self.Looping = Core.EventManager(self.looping)
-        self.Closing = Core.EventManager(self.closing)
+        self.looping = Looping()
+        self.closing = Closing()
 
         super().__init__(_name, _class, _tag)
-
-    def looping(self):
-        """Open layer loop"""
-        self.loop = True
-
-    def closing(self):
-        """Close layer loop"""
-        self.loop = False
 
     def find(self, key: By.NAME, val):
         """
