@@ -63,26 +63,12 @@ class BufferManager:
                  symbol: str = None,
                  colm_len: int = 10,
                  algn_len: int = 10):
-
-        class Join(EventManager):
-            def func(cls, *args, **kwargs):
-                ret = list(range(self.colm_len if len(self.buffer) > self.colm_len else len(self.buffer)))
-                index = 0
-                for i in self.buffer:
-                    i = i.ljust(self.algn_len)
-                    ret[index] = i if type(ret[index]) == int else ret[index] + i
-                    if index < self.colm_len - 1:
-                        index += 1
-                    else:
-                        index = 0
-                return self.symbol.join(ret)
-
         self.buffer = buffer or []
         self.symbol = symbol or "\n"
         self.colm_len = colm_len
         self.algn_len = algn_len
 
-        self.join = Join()
+        self.join = EventManager(self.__join)
 
     def __iadd__(self, other: str):
         self.addToBuffer(other)
@@ -94,6 +80,18 @@ class BufferManager:
 
     def __str__(self):
         return self.join()
+
+    def __join(self):
+        ret = list(range(self.colm_len if len(self.buffer) > self.colm_len else len(self.buffer)))
+        index = 0
+        for i in self.buffer:
+            i = i.ljust(self.algn_len)
+            ret[index] = i if type(ret[index]) == int else ret[index] + i
+            if index < self.colm_len - 1:
+                index += 1
+            else:
+                index = 0
+        return self.symbol.join(ret)
 
     def addToBuffer(self, *args: str):
         for i in args:
