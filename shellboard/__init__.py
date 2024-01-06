@@ -6,7 +6,7 @@ Discord Server - https://discord.com/invite/jchJKYqNmK
 Youtube - https://www.youtube.com/@sw3aty702
 """
 
-__version__ = "0.4.0.1a1"
+__version__ = "0.4.0.1a2"
 
 function = type(lambda: 0)
 
