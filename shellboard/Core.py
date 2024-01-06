@@ -36,7 +36,7 @@ class EventManager:
     def combine(self, func):
         def wrapper():
             func(self.event)
-        return self.__class__(wrapper)
+        return lambda: self.__class__(wrapper)
 
     def on(self):
         return self.event()
