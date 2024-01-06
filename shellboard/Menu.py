@@ -1,4 +1,4 @@
-from . import colorama, Core, function
+from . import colorama, Core, function, datetime
 from .Widgets import By as BY, LayerType, WidgetType
 
 
@@ -20,8 +20,7 @@ class mLayer(LayerType, Core.InputManager):
         """
         :param title: Instance name.
         """
-        from datetime import datetime
-        self.datetime = datetime
+        self.datetime = datetime.datetime
 
         self.title = title
 
