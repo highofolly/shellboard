@@ -2,8 +2,9 @@
 .vscode/
 build/
 dist/
-*.pyc
 env/
 venv/
+shellboard.egg-info/
+*.pyc
 
 test.py
