@@ -1,6 +1,8 @@
 """
 shellboard - cross-platform framework that facilitates the development of a graphical interface for the command shell
 Credits:
+Author - Sw3aty-Acc
+Source - https://github.com/Sw3aty-Acc/shellboard
 Email - sw3atyspace@gmail.com
 Discord Server - https://discord.com/invite/jchJKYqNmK
 Youtube - https://www.youtube.com/@sw3aty702
