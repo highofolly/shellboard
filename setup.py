@@ -9,7 +9,7 @@ def readme():
 
 setup(
     name="shellboard",
-    author="Sw3aty",
+    author="sweaty-bunny",
     author_email="sw3atyspace@gmail.com",
     url="https://github.com/Sw3aty-Acc/shellboard.git",
     version=shellboard.__version__,
@@ -19,7 +19,7 @@ setup(
     description="shellboard - cross-platform framework that facilitates the development of a graphical interface for the command shell",
     long_description=readme(),
     long_description_content_type='text/markdown',
-    keywords="menu shell visual vishhhl visualmenu",
+    keywords="menu qt shell visual vishhhl visualmenu",
     project_urls={
         "Repository": "https://github.com/Sw3aty-Acc/shellboard.git",
         "Issues": "https://github.com/Sw3aty-Acc/shellboard/issues",
